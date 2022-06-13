@@ -98,8 +98,8 @@ const Pool = function(config, configMain, responseFn) {
   // Check if Auxiliary Share is a Valid Block Candidate
   this.checkAuxiliary = function(shareData) {
     if (_this.auxiliary.enabled) {
-      const shareMultiplier = Algorithms.scrypt.multiplier;
-      const shareDiff = Algorithms.scrypt.diff / Number(_this.auxiliary.rpcData.target);
+      const shareMultiplier = Algorithms.equihash.multiplier;
+      const shareDiff = Algorithms.equihash.diff / Number(_this.auxiliary.rpcData.target);
       shareData.blockDiffAuxiliary = shareDiff * shareMultiplier;
       return _this.auxiliary.rpcData.target >= shareData.headerDiff;
     }
