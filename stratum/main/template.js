@@ -1,11 +1,12 @@
 const Algorithms = require('./algorithms');
+const Hashes = require('./hashes');
 const Transactions = require('./transactions');
 const utils = require('./utils');
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // Main Template Function
-const Template = function(jobId, config, rpcData, placeholder) {
+const Template = function(jobId, config, rpcData) {
 
   const _this = this;
   this.jobId = jobId;
@@ -15,45 +16,42 @@ const Template = function(jobId, config, rpcData, placeholder) {
 
   // Template Variables
   this.target = _this.rpcData.target ? BigInt(`0x${ _this.rpcData.target }`) : utils.bigIntFromBitsHex(_this.rpcData.bits);
-  this.difficulty = parseFloat((Algorithms.sha256d.diff / Number(_this.target)).toFixed(9));
-  this.previous = utils.reverseByteOrder(Buffer.from(_this.rpcData.previousblockhash, 'hex')).toString('hex');
-  this.generation = new Transactions(config).handleGeneration(rpcData, placeholder);
-  this.steps = utils.getMerkleSteps(_this.rpcData.transactions);
+  this.difficulty = parseFloat((Algorithms.equihash.diff / Number(_this.target)).toFixed(9));
+  this.hashes = new Hashes(config, rpcData);
+  this.previous = Buffer.from(_this.rpcData.previousblockhash, 'hex');
+  this.history = Buffer.from(_this.rpcData.defaultroots.chainhistoryroot, 'hex');
+  this.generation = new Transactions(config, rpcData).handleGeneration();
+
+  // Build Transaction Digests
+  this.merkle = Buffer.from(_this.hashes.handleTxIdDigest(_this.generation[2]).digest('hex'), 'hex');
+  this.commit = Buffer.from(_this.hashes.handleCommitDigest(_this.history, _this.generation[1]).digest('hex'), 'hex');
 
   // Manage Serializing Block Headers
-  this.handleHeader = function(version, merkleRoot, nTime, nonce) {
+  this.handleHeader = function(version, nTime, nonce) {
 
     // Initialize Header/Pointer
     let position = 0;
-    let header = Buffer.alloc(80);
+    let header = Buffer.alloc(140);
 
     // Append Data to Buffer
-    header.write(nonce, position, 4, 'hex');
-    header.write(_this.rpcData.bits, position += 4, 4, 'hex');
-    header.write(nTime, position += 4, 4, 'hex');
-    header.write(utils.reverseBuffer(merkleRoot).toString('hex'), position += 4, 32, 'hex');
-    header.write(_this.rpcData.previousblockhash, position += 32, 32, 'hex');
+    header.write(utils.reverseBuffer(Buffer.from(nonce, 'hex')).toString('hex'), position, 32, 'hex');
+    header.write(_this.rpcData.bits, position += 32, 4, 'hex');
+    header.write(utils.reverseBuffer(Buffer.from(nTime, 'hex')).toString('hex'), position += 4, 4, 'hex');
+    header.write(utils.reverseBuffer(_this.commit).toString('hex'), position += 4, 32, 'hex');
+    header.write(utils.reverseBuffer(_this.merkle).toString('hex'), position += 32, 32, 'hex');
+    header.write(_this.previous.toString('hex'), position += 32, 32, 'hex');
     header.writeUInt32BE(version, position += 32);
     header = utils.reverseBuffer(header);
     return header;
   };
 
-  // Manage Serializing Block Coinbase
-  this.handleCoinbase = function(extraNonce1, extraNonce2) {
-    return Buffer.concat([
-      _this.generation[0],
-      extraNonce1,
-      extraNonce2,
-      _this.generation[1],
-    ]);
-  };
-
   // Manage Serializing Block Objects
-  this.handleBlocks = function(header, coinbase) {
+  this.handleBlocks = function(header, solution) {
     return Buffer.concat([
       header,
+      solution,
       utils.varIntBuffer(_this.rpcData.transactions.length + 1),
-      coinbase,
+      _this.generation[0],
       Buffer.concat(_this.rpcData.transactions.map((tx) => Buffer.from(tx.data, 'hex'))),
     ]);
   };
@@ -62,13 +60,12 @@ const Template = function(jobId, config, rpcData, placeholder) {
   this.handleParameters = function(cleanJobs) {
     return [
       _this.jobId,
-      _this.previous,
-      _this.generation[0].toString('hex'),
-      _this.generation[1].toString('hex'),
-      _this.steps.map((step) => step.toString('hex')),
-      utils.packInt32BE(_this.rpcData.version).toString('hex'),
-      _this.rpcData.bits,
-      utils.packUInt32BE(_this.rpcData.curtime).toString('hex'),
+      utils.packInt32LE(_this.rpcData.version).toString('hex'),
+      utils.reverseBuffer(_this.previous).toString('hex'),
+      _this.merkle.toString('hex'),
+      _this.commit.toString('hex'),
+      utils.packUInt32LE(_this.rpcData.curtime).toString('hex'),
+      utils.reverseBuffer(Buffer.from(_this.rpcData.bits, 'hex')).toString('hex'),
       cleanJobs
     ];
   };

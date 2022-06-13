@@ -1,6 +1,6 @@
 /*
  *
- * Example (Bitcoin)
+ * Example (Zcash)
  *
  */
 
@@ -49,15 +49,15 @@ config.primary.address = 'example';
 
 // Coin Configuration
 config.primary.coin = {};
-config.primary.coin.name = 'Bitcoin';
-config.primary.coin.symbol = 'BTC';
+config.primary.coin.name = 'Zcash';
+config.primary.coin.symbol = 'ZEC';
 
 // Daemon Configuration
 config.primary.daemons = [];
 
 const daemons1 = {};
 daemons1.host = '127.0.0.1';
-daemons1.port = 8332;
+daemons1.port = 8232;
 daemons1.username = '';
 daemons1.password = '';
 config.primary.daemons.push(daemons1);

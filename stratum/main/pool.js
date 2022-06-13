@@ -110,11 +110,11 @@ const Pool = function(config, configMain, responseFn) {
   this.checkDownloaded = function(daemon) {
     daemon.sendCommands([['getblockchaininfo', []]], false, (results) => {
       const blocks = Math.max(0, results
-        .flatMap(result => result.response)
-        .flatMap(response => response.blocks));
+        .flatMap((result) => result.response)
+        .flatMap((response) => response.blocks));
       daemon.sendCommands([['getpeerinfo', []]], true, (result) => {
         const peers = result.response;
-        const totalBlocks = Math.max(0, peers.flatMap(response => response.startingheight));
+        const totalBlocks = Math.max(0, peers.flatMap((response) => response.startingheight));
         const percent = (blocks / totalBlocks * 100).toFixed(2);
         _this.emitLog('warning', true, _this.text.stratumDownloadedText1(percent, peers.length));
       });
@@ -149,19 +149,25 @@ const Pool = function(config, configMain, responseFn) {
     // Build Daemon Commands
     const rules = ['segwit'];
     const capabilities = ['coinbasetxn', 'workid', 'coinbase/append'];
-    const commands = [['getblocktemplate', [{ 'capabilities': capabilities, 'rules': rules }]]];
+    const commands = [
+      ['getblocktemplate', [{ 'capabilities': capabilities, 'rules': rules }]],
+      ['getblocksubsidy', []]];
 
     // Handle Primary Block Template Updates
     _this.primary.daemon.sendCommands(commands, true, (result) => {
-      if (result.error) {
-        _this.emitLog('error', false, _this.text.stratumTemplateText1(result.instance.host, JSON.stringify(result.error)));
-        callback(result.error);
+      if (result[0].error) {
+        _this.emitLog('error', false, _this.text.stratumTemplateText1(result[0].instance.host, JSON.stringify(result[0].error)));
+        callback(result[0].error);
+      } else if (result[1].error) {
+        _this.emitLog('error', false, _this.text.stratumTemplateText1(result[1].instance.host, JSON.stringify(result[1].error)));
+        callback(result[1].error);
       } else {
         if (_this.auxiliary.enabled) {
-          result.response.auxData = _this.auxiliary.rpcData;
+          result[0].response.auxData = _this.auxiliary.rpcData;
         }
-        const newBlockFound = _this.manager.handleTemplate(result.response, newBlock);
-        callback(null, result.response, newBlockFound);
+        result[0].response.subsidy = result[1].response;
+        const newBlockFound = _this.manager.handleTemplate(result[0].response, newBlock);
+        callback(null, result[0].response, newBlockFound);
       }
     });
   };
@@ -292,7 +298,7 @@ const Pool = function(config, configMain, responseFn) {
   this.setupPorts = function() {
 
     // Initiailize Each Port w/ VarDiff
-    _this.config.ports.forEach(port => {
+    _this.config.ports.forEach((port) => {
       const difficultyInstance = new Difficulty(port.difficulty);
       if (port.port in _this.difficulty) _this.difficulty[port.port].removeAllListeners();
       _this.difficulty[port.port] = difficultyInstance;
@@ -345,7 +351,7 @@ const Pool = function(config, configMain, responseFn) {
       // Initialize Statistics/Settings
       _this.settings.testnet = (resultData.getblockchaininfo.chain === 'test') ? true : false;
       _this.statistics.connections = resultData.getnetworkinfo.connections;
-      _this.statistics.difficulty = difficulty * Algorithms.sha256d.multiplier;
+      _this.statistics.difficulty = difficulty * Algorithms.equihash.multiplier;
       _this.config.settings.testnet = _this.settings.testnet;
 
       callback();
@@ -362,7 +368,7 @@ const Pool = function(config, configMain, responseFn) {
 
     // Calculate Sum of All Recipients
     _this.statistics.feePercentage = 0;
-    _this.config.primary.recipients.forEach(recipient => {
+    _this.config.primary.recipients.forEach((recipient) => {
       _this.statistics.feePercentage += recipient.percentage;
     });
   };
@@ -549,8 +555,8 @@ const Pool = function(config, configMain, responseFn) {
 
       // Send Correct Initial Difficulty to Miner
       const validPorts = _this.config.ports
-        .filter(port => port.port === client.socket.localPort)
-        .filter(port => typeof port.difficulty.initial !== 'undefined');
+        .filter((port) => port.port === client.socket.localPort)
+        .filter((port) => typeof port.difficulty.initial !== 'undefined');
       if (validPorts.length >= 1) client.broadcastDifficulty(validPorts[0].difficulty.initial);
       else client.broadcastDifficulty(8);
 
@@ -565,12 +571,10 @@ const Pool = function(config, configMain, responseFn) {
       // Build Share Submission Data
       const submission = {
         extraNonce1: client.extraNonce1,
-        extraNonce2: message.params[2],
-        nTime: message.params[3],
-        nonce: message.params[4],
-        versionBit: message.params[5],
-        versionMask: client.versionMask,
-        asicboost: client.asicboost,
+        extraNonce2: message.params[3],
+        nTime: message.params[2],
+        solution: message.params[4],
+        nonce: client.extraNonce1 + message.params[3],
       };
 
       // Submit Share to Job Manager
@@ -597,8 +601,8 @@ const Pool = function(config, configMain, responseFn) {
     _this.network = new Network(_this.config, _this.configMain, _this.authorizeWorker);
     _this.network.on('network.started', () => {
       _this.statistics.ports = _this.config.ports
-        .filter(port => port.enabled)
-        .flatMap(port => port.port);
+        .filter((port) => port.enabled)
+        .flatMap((port) => port.port);
       _this.network.broadcastMiningJobs(_this.manager.currentJob, true);
       callback();
     });

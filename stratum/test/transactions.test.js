@@ -2,7 +2,9 @@ const Transactions = require('../main/transactions');
 const config = require('../../configs/example');
 const testdata = require('../../daemon/test/daemon.mock');
 
-config.primary.address = 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq';
+const blockTemplate = testdata.getBlockTemplate();
+blockTemplate.subsidy = testdata.getBlockSubsidy();
+config.primary.address = 't3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym';
 config.primary.recipients = [];
 
 const auxiliaryConfig = {
@@ -17,8 +19,6 @@ const auxiliaryData = {
   'hash': '17a35a38e70cd01488e0d5ece6ded04a9bc8125865471d36b9d5c47a08a5907c',
 };
 
-const extraNonce = Buffer.from('f000000ff111111f', 'hex');
-
 ////////////////////////////////////////////////////////////////////////////////
 
 describe('Test transactions functionality', () => {
@@ -26,68 +26,53 @@ describe('Test transactions functionality', () => {
   let configCopy, rpcDataCopy;
   beforeEach(() => {
     configCopy = JSON.parse(JSON.stringify(config));
-    rpcDataCopy = JSON.parse(JSON.stringify(testdata.getBlockTemplate()));
+    rpcDataCopy = JSON.parse(JSON.stringify(blockTemplate));
   });
 
   test('Test main transaction builder [1]', () => {
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, -5)).toStrictEqual(Buffer.from('04000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0f5104', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('000000000200f2052a01000000160014e8df018c7e326cc253faac7e46cdc51e68542c420000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000', 'hex'));
+    const transaction = new Transactions(configCopy, rpcDataCopy).handleGeneration();
+    const outputs = ['80b2e60e0000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '38c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '286bee000000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '40787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987'];
+    expect(transaction[0]).toStrictEqual(Buffer.from('050000800a27a726b4d0d6c2000000005d2a1d00010000000000000000000000000000000000000000000000000000000000000000ffffffff04035d2a1dffffffff0480b2e60e0000000017a914931fec54c1fea86e574462cc32013f5400b891298738c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987286bee000000000017a914931fec54c1fea86e574462cc32013f5400b891298740787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987000000', 'hex'));
+    expect(transaction[1]).toStrictEqual(Buffer.from('04035d2a1d', 'hex'));
+    expect(transaction[2].map((hash) => hash.toString('hex'))).toStrictEqual(outputs);
   });
 
   test('Test main transaction builder [2]', () => {
-    rpcDataCopy.coinbasetxn = {};
-    rpcDataCopy.coinbasetxn.data = '0500008085202';
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, -5)).toStrictEqual(Buffer.from('05000080010000000000000000000000000000000000000000000000000000000000000000ffffffff0f5104', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('000000000200f2052a01000000160014e8df018c7e326cc253faac7e46cdc51e68542c420000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000', 'hex'));
+    configCopy.primary.recipients.push({ address: 't3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym', percentage: 0.05 });
+    const transaction = new Transactions(configCopy, rpcDataCopy).handleGeneration();
+    const outputs = ['60f6270e0000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '38c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '286bee000000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '40787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '20bcbe000000000017a914931fec54c1fea86e574462cc32013f5400b8912987'];
+    expect(transaction[0]).toStrictEqual(Buffer.from('050000800a27a726b4d0d6c2000000005d2a1d00010000000000000000000000000000000000000000000000000000000000000000ffffffff04035d2a1dffffffff0560f6270e0000000017a914931fec54c1fea86e574462cc32013f5400b891298738c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987286bee000000000017a914931fec54c1fea86e574462cc32013f5400b891298740787d010000000017a914931fec54c1fea86e574462cc32013f5400b891298720bcbe000000000017a914931fec54c1fea86e574462cc32013f5400b8912987000000', 'hex'));
+    expect(transaction[1]).toStrictEqual(Buffer.from('04035d2a1d', 'hex'));
+    expect(transaction[2].map((hash) => hash.toString('hex'))).toStrictEqual(outputs);
   });
 
   test('Test main transaction builder [3]', () => {
-    configCopy.primary.recipients.push({ address: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', percentage: 0.05 });
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, -5)).toStrictEqual(Buffer.from('04000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0f5104', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('0000000003803f1f1b01000000160014e8df018c7e326cc253faac7e46cdc51e68542c4280b2e60e00000000160014e8df018c7e326cc253faac7e46cdc51e68542c420000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000', 'hex'));
+    configCopy.primary.recipients.push({ address: 't3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym', percentage: 0.05 });
+    configCopy.primary.recipients.push({ address: 't3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym', percentage: 0.05 });
+    const transaction = new Transactions(configCopy, rpcDataCopy).handleGeneration();
+    const outputs = ['403a690d0000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '38c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '286bee000000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '40787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '20bcbe000000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '20bcbe000000000017a914931fec54c1fea86e574462cc32013f5400b8912987'];
+    expect(transaction[0]).toStrictEqual(Buffer.from('050000800a27a726b4d0d6c2000000005d2a1d00010000000000000000000000000000000000000000000000000000000000000000ffffffff04035d2a1dffffffff06403a690d0000000017a914931fec54c1fea86e574462cc32013f5400b891298738c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987286bee000000000017a914931fec54c1fea86e574462cc32013f5400b891298740787d010000000017a914931fec54c1fea86e574462cc32013f5400b891298720bcbe000000000017a914931fec54c1fea86e574462cc32013f5400b891298720bcbe000000000017a914931fec54c1fea86e574462cc32013f5400b8912987000000', 'hex'));
+    expect(transaction[1]).toStrictEqual(Buffer.from('04035d2a1d', 'hex'));
+    expect(transaction[2].map((hash) => hash.toString('hex'))).toStrictEqual(outputs);
   });
 
   test('Test main transaction builder [4]', () => {
-    configCopy.primary.recipients.push({ address: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', percentage: 0.05 });
-    configCopy.primary.recipients.push({ address: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', percentage: 0.05 });
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, -5)).toStrictEqual(Buffer.from('04000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0f5104', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('0000000004008d380c01000000160014e8df018c7e326cc253faac7e46cdc51e68542c4280b2e60e00000000160014e8df018c7e326cc253faac7e46cdc51e68542c4280b2e60e00000000160014e8df018c7e326cc253faac7e46cdc51e68542c420000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000', 'hex'));
+    delete rpcDataCopy.default_witness_commitment;
+    const transaction = new Transactions(configCopy, rpcDataCopy).handleGeneration();
+    const outputs = ['80b2e60e0000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '38c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '286bee000000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '40787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987'];
+    expect(transaction[0]).toStrictEqual(Buffer.from('050000800a27a726b4d0d6c2000000005d2a1d00010000000000000000000000000000000000000000000000000000000000000000ffffffff04035d2a1dffffffff0480b2e60e0000000017a914931fec54c1fea86e574462cc32013f5400b891298738c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987286bee000000000017a914931fec54c1fea86e574462cc32013f5400b891298740787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987000000', 'hex'));
+    expect(transaction[1]).toStrictEqual(Buffer.from('04035d2a1d', 'hex'));
+    expect(transaction[2].map((hash) => hash.toString('hex'))).toStrictEqual(outputs);
   });
 
   test('Test main transaction builder [5]', () => {
-    rpcDataCopy.coinbaseaux.flags = 'test';
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, -5)).toStrictEqual(Buffer.from('04000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0f5104', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('000000000200f2052a01000000160014e8df018c7e326cc253faac7e46cdc51e68542c420000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000', 'hex'));
-  });
-  //
-  test('Test main transaction builder [6]', () => {
-    delete rpcDataCopy.default_witness_commitment;
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, -5)).toStrictEqual(Buffer.from('04000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0f5104', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('000000000100f2052a01000000160014e8df018c7e326cc253faac7e46cdc51e68542c4200000000', 'hex'));
-  });
-
-  test('Test main transaction builder [7]', () => {
     rpcDataCopy.auxData = auxiliaryData;
     configCopy.auxiliary = auxiliaryConfig;
     configCopy.auxiliary.enabled = true;
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, 44)).toStrictEqual(Buffer.from('04000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3b5104', 'hex'));
-    expect(transaction[0].slice(49, 53)).toStrictEqual(Buffer.from('fabe6d6d', 'hex'));
-    expect(transaction[0].slice(53)).toStrictEqual(Buffer.from('17a35a38e70cd01488e0d5ece6ded04a9bc8125865471d36b9d5c47a08a5907c0100000000000000', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('000000000200f2052a01000000160014e8df018c7e326cc253faac7e46cdc51e68542c420000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000', 'hex'));
-  });
-
-  test('Test main transaction builder [8]', () => {
-    configCopy.settings.testnet = true;
-    configCopy.primary.address = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx';
-    const transaction = new Transactions(configCopy).handleGeneration(rpcDataCopy, extraNonce);
-    expect(transaction[0].slice(0, -5)).toStrictEqual(Buffer.from('04000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0f5104', 'hex'));
-    expect(transaction[1]).toStrictEqual(Buffer.from('000000000200f2052a01000000160014751e76e8199196d454941c45d1b3a323f1433bd60000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf900000000', 'hex'));
+    const transaction = new Transactions(configCopy, rpcDataCopy).handleGeneration();
+    const outputs = ['80b2e60e0000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '38c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '286bee000000000017a914931fec54c1fea86e574462cc32013f5400b8912987', '40787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987'];
+    expect(transaction[0]).toStrictEqual(Buffer.from('050000800a27a726b4d0d6c2000000005d2a1d00010000000000000000000000000000000000000000000000000000000000000000ffffffff30035d2a1dfabe6d6d17a35a38e70cd01488e0d5ece6ded04a9bc8125865471d36b9d5c47a08a5907c0100000000000000ffffffff0480b2e60e0000000017a914931fec54c1fea86e574462cc32013f5400b891298738c94d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987286bee000000000017a914931fec54c1fea86e574462cc32013f5400b891298740787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987000000', 'hex'));
+    expect(transaction[1]).toStrictEqual(Buffer.from('30035d2a1dfabe6d6d17a35a38e70cd01488e0d5ece6ded04a9bc8125865471d36b9d5c47a08a5907c0100000000000000', 'hex'));
+    expect(transaction[2].map((hash) => hash.toString('hex'))).toStrictEqual(outputs);
   });
 });

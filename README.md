@@ -1,7 +1,7 @@
 # Foundation Stratum (Template, v2)
 
-[![Codecov Coverage](https://img.shields.io/codecov/c/github/blinkhash/foundation-v2-template.svg?style=flat-square)](https://codecov.io/gh/blinkhash/foundation-v2-template/)
-[![Foundation CI](https://github.com/blinkhash/foundation-v2-template/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/blinkhash/foundation-v2-template/actions/workflows/build.yml)
+[![Codecov Coverage](https://img.shields.io/codecov/c/github/blinkhash/foundation-v2-zcash.svg?style=flat-square)](https://codecov.io/gh/blinkhash/foundation-v2-zcash/)
+[![Foundation CI](https://github.com/blinkhash/foundation-v2-zcash/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/blinkhash/foundation-v2-zcash/actions/workflows/build.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Discord](https://img.shields.io/discord/738590795384356904)](https://discord.gg/rNjez6VgNF)
 
@@ -20,7 +20,7 @@ Maintaining this project has always been driven out of nothing more than a desir
 - Bitcoin: 3EbrVYLxN5WeQmPpL6owo3A7rJELXecbbc
 - Ethereum: 0xd3e3daED621d228244Fa89A3dd8AF07B52E72319
 - Litecoin: MFWpARrSADAy3Qj79C4pSasS9F156QipwC
-- ZCash: t1NSk8gyiou8TxWRZTVuUkfM5f9riopN58A
+- Zcash: t1NSk8gyiou8TxWRZTVuUkfM5f9riopN58A
 
 ---
 

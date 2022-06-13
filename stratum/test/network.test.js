@@ -6,7 +6,9 @@ const configMain = require('../../configs/main');
 const events = require('events');
 const testdata = require('../../daemon/test/daemon.mock');
 
-config.primary.address = 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq';
+const blockTemplate = testdata.getBlockTemplate();
+blockTemplate.subsidy = testdata.getBlockSubsidy();
+config.primary.address = 't3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym';
 config.primary.recipients = [];
 
 const jobId = 1;
@@ -50,7 +52,7 @@ describe('Test network functionality', () => {
   beforeEach(() => {
     configCopy = JSON.parse(JSON.stringify(config));
     configMainCopy = JSON.parse(JSON.stringify(configMain));
-    rpcDataCopy = JSON.parse(JSON.stringify(testdata.getBlockTemplate()));
+    rpcDataCopy = JSON.parse(JSON.stringify(blockTemplate));
   });
 
   test('Test initialization of stratum network', (done) => {
@@ -63,7 +65,7 @@ describe('Test network functionality', () => {
   test('Test network banning capabilities [1]', (done) => {
     const network = new Network(configCopy, configMainCopy, () => {});
     const client = mockClient();
-    client.on('client.ban.kicked', timeLeft => {
+    client.on('client.ban.kicked', (timeLeft) => {
       network.on('network.stopped', () => done());
       expect(timeLeft >= 0).toBeTruthy();
       network.stopNetwork();
