@@ -1,4 +1,4 @@
-# Foundation Stratum (Template, v2)
+# Foundation Stratum (Zcash, v2)
 
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/blinkhash/foundation-v2-zcash.svg?style=flat-square)](https://codecov.io/gh/blinkhash/foundation-v2-zcash/)
 [![Foundation CI](https://github.com/blinkhash/foundation-v2-zcash/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/blinkhash/foundation-v2-zcash/actions/workflows/build.yml)
