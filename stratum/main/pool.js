@@ -155,7 +155,10 @@ const Pool = function(config, configMain, responseFn) {
 
     // Handle Primary Block Template Updates
     _this.primary.daemon.sendCommands(commands, true, (result) => {
-      if (result[0].error) {
+      if (result.error) {
+        _this.emitLog('error', false, _this.text.stratumTemplateText1(result.instance.host, JSON.stringify(result.error)));
+        callback(result.error);
+      } else if (result[0].error) {
         _this.emitLog('error', false, _this.text.stratumTemplateText1(result[0].instance.host, JSON.stringify(result[0].error)));
         callback(result[0].error);
       } else if (result[1].error) {
