@@ -489,7 +489,8 @@ describe('Test pool functionality', () => {
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
-        pool.on('pool.share', () => {
+        pool.on('pool.share', (data, type) => {
+          expect(type).toBe(true);
           nock('http://127.0.0.1:8232')
             .post('/').reply(200, JSON.stringify([
               { id: 'nocktest', error: null, result: rpcDataCopy },
@@ -569,7 +570,8 @@ describe('Test pool functionality', () => {
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
-        pool.on('pool.share', () => {
+        pool.on('pool.share', (data, type) => {
+          expect(type).toBe(true);
           nock('http://127.0.0.1:8232')
             .post('/').reply(200, JSON.stringify([
               { id: 'nocktest', error: null, result: rpcDataCopy },
@@ -653,7 +655,8 @@ describe('Test pool functionality', () => {
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
-        pool.on('pool.share', () => {
+        pool.on('pool.share', (data, type) => {
+          expect(type).toBe(true);
           nock('http://127.0.0.1:8232')
             .post('/').reply(200, JSON.stringify([
               { id: 'nocktest', error: true, result: null },
@@ -737,7 +740,8 @@ describe('Test pool functionality', () => {
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
-        pool.on('pool.share', () => {
+        pool.on('pool.share', (data, type) => {
+          expect(type).toBe(true);
           nock('http://127.0.0.1:8232')
             .post('/').reply(200, JSON.stringify([
               { id: 'nocktest', error: null, result: rpcDataCopy },
@@ -815,7 +819,8 @@ describe('Test pool functionality', () => {
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
-        pool.on('pool.share', () => {
+        pool.on('pool.share', (data, type) => {
+          expect(type).toBe(true);
           nock('http://127.0.0.1:8232')
             .post('/').reply(200, JSON.stringify([
               { id: 'nocktest', error: true, result: null },
@@ -876,7 +881,7 @@ describe('Test pool functionality', () => {
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
         pool.on('pool.share', (data, type) => {
-          expect(type).toBe('stale');
+          expect(type).toBe(false);
           nock('http://127.0.0.1:8232')
             .post('/').reply(200, JSON.stringify([
               { id: 'nocktest', error: true, result: null },
@@ -909,7 +914,7 @@ describe('Test pool functionality', () => {
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
         pool.on('pool.share', (data, type) => {
-          expect(type).toBe('invalid');
+          expect(type).toBe(false);
           nock('http://127.0.0.1:8232')
             .post('/').reply(200, JSON.stringify([
               { id: 'nocktest', error: true, result: null },
