@@ -1185,6 +1185,14 @@ describe('Test pool functionality', () => {
             mockSetupFirstJob(pool, () => {
               nock('http://127.0.0.1:8232')
                 .persist()
+                .post('/', (body) => body.method === 'getblockchaininfo')
+                .reply(200, JSON.stringify({
+                  id: 'nocktest',
+                  error: null,
+                  result: blockchainDataCopy,
+                }));
+              nock('http://127.0.0.1:8232')
+                .persist()
                 .post('/').reply(200, JSON.stringify([
                   { id: 'nocktest', error: null, result: rpcDataCopy },
                   { id: 'nocktest', error: null, result: subsidyCopy },
@@ -1222,6 +1230,22 @@ describe('Test pool functionality', () => {
         mockSetupPrimaryBlockchain(pool, () => {
           mockSetupAuxiliaryBlockchain(pool, () => {
             mockSetupFirstJob(pool, () => {
+              nock('http://127.0.0.1:8232')
+                .persist()
+                .post('/', (body) => body.method === 'getblockchaininfo')
+                .reply(200, JSON.stringify({
+                  id: 'nocktest',
+                  error: null,
+                  result: blockchainDataCopy,
+                }));
+              nock('http://127.0.0.1:8236')
+                .persist()
+                .post('/', (body) => body.method === 'getblockchaininfo')
+                .reply(200, JSON.stringify({
+                  id: 'nocktest',
+                  error: null,
+                  result: blockchainDataCopy,
+                }));
               nock('http://127.0.0.1:8232')
                 .persist()
                 .post('/').reply(200, JSON.stringify([
@@ -1267,6 +1291,22 @@ describe('Test pool functionality', () => {
         mockSetupPrimaryBlockchain(pool, () => {
           mockSetupAuxiliaryBlockchain(pool, () => {
             mockSetupFirstJob(pool, () => {
+              nock('http://127.0.0.1:8232')
+                .persist()
+                .post('/', (body) => body.method === 'getblockchaininfo')
+                .reply(200, JSON.stringify({
+                  id: 'nocktest',
+                  error: null,
+                  result: blockchainDataCopy,
+                }));
+              nock('http://127.0.0.1:8236')
+                .persist()
+                .post('/', (body) => body.method === 'getblockchaininfo')
+                .reply(200, JSON.stringify({
+                  id: 'nocktest',
+                  error: null,
+                  result: blockchainDataCopy,
+                }));
               nock('http://127.0.0.1:8232')
                 .persist()
                 .post('/').reply(200, JSON.stringify([
@@ -1316,6 +1356,22 @@ describe('Test pool functionality', () => {
         mockSetupPrimaryBlockchain(pool, () => {
           mockSetupAuxiliaryBlockchain(pool, () => {
             mockSetupFirstJob(pool, () => {
+              nock('http://127.0.0.1:8232')
+                .persist()
+                .post('/', (body) => body.method === 'getblockchaininfo')
+                .reply(200, JSON.stringify({
+                  id: 'nocktest',
+                  error: null,
+                  result: blockchainDataCopy,
+                }));
+              nock('http://127.0.0.1:8236')
+                .persist()
+                .post('/', (body) => body.method === 'getblockchaininfo')
+                .reply(200, JSON.stringify({
+                  id: 'nocktest',
+                  error: null,
+                  result: blockchainDataCopy,
+                }));
               nock('http://127.0.0.1:8232')
                 .persist()
                 .post('/').reply(200, JSON.stringify([

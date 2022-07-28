@@ -538,19 +538,12 @@ const Pool = function(config, configMain, responseFn) {
     setInterval(() => {
       if (pollingFlag === false) {
         pollingFlag = true;
-
-        // Check Auxiliary Template for Updates
         _this.checkAuxiliaryTemplate((auxError) => {
           if (!auxError) {
             _this.handleAuxiliaryTemplate((auxError, auxResult, auxUpdate) => {
-
-              // Check Primary Template for Updates
               _this.checkPrimaryTemplate((error, update) => {
                 if (!error && update) {
-                  console.log("HANDLES", process.env.forkId)
                   _this.handlePrimaryTemplate(auxUpdate, (error, result, update) => {
-
-                    // Handle Responses
                     pollingFlag = false;
                     if (update) _this.emitLog('log', true, _this.text.stratumPollingText1(_this.config.primary.coin.name, result.height));
                     if (auxUpdate) _this.emitLog('log', true, _this.text.stratumPollingText2(_this.config.auxiliary.coin.name, auxResult.height));
@@ -646,18 +639,7 @@ const Pool = function(config, configMain, responseFn) {
       };
 
       // Submit Share to Job Manager
-      const result = _this.manager.handleShare(
-        message.params[1],
-        client.previousDifficulty,
-        client.difficulty,
-        client.socket.remoteAddress,
-        client.socket.localPort,
-        client.addrPrimary,
-        client.addrAuxiliary,
-        submission,
-      );
-
-      // Return Job Manager Response
+      const result = _this.manager.handleShare(message.params[1], client, submission);
       callback(result.error, result.response ? true : null);
     });
   };
