@@ -44,6 +44,60 @@ exports.getBlockTemplate = function() {
   };
 };
 
+exports.getBlockTemplateWithTransaction = function() {
+  return {
+    "capabilities": [
+      "proposal"
+    ],
+    "version": 4,
+    "previousblockhash": "00000000003ebf83625de8dca4f1e4b20bf429048658f90bd5bc64cb31ab60f7",
+    "blockcommitmentshash": "4eec3ba358bfc94b1fbb577bf5f840741af1dc10245b547b04c49774f08c2c48",
+    "lightclientroothash": "4eec3ba358bfc94b1fbb577bf5f840741af1dc10245b547b04c49774f08c2c48",
+    "finalsaplingroothash": "4eec3ba358bfc94b1fbb577bf5f840741af1dc10245b547b04c49774f08c2c48",
+    "defaultroots": {
+      "merkleroot": "b72696befeaf31a2338f8fa7f4d79506be60d5b48bc7c758bae4ac240293aa47",
+      "chainhistoryroot": "edf76a443696cf288910dd1f0887d5f3dec8d6402673170558182265d6cfa6ce",
+      "authdataroot": "cb6b6b66d7496701a4b3f05f446079bc248eb71ba54801fd25c273a465518034",
+      "blockcommitmentshash": "4eec3ba358bfc94b1fbb577bf5f840741af1dc10245b547b04c49774f08c2c48"
+    },
+    "transactions": [
+      {
+        "data": "0400008085202f8901b68e584f5219c7021a1d568c38956e34bc4357f14315ee422f519cfc5a68816c000000006a47304402206dbfb90c2294256b1dce12904be30acb26c2c7116ae9ee371e31deb5b88ed22302206072449f1bd5ab89b82468ad254d03469447d8f6c7d3b5d4dc7d2198af2d4a7e012103d4df52365b1acc014a072c374f2342b20f398d6b7aa7e2d289c0409a357328e40000000001ec91e111000000001976a9144aaa7def82adc14836ddca51348b3c3f9f156b3688ac00000000000000000000000000000000000000",
+        "hash": "a4fa6d6291663b53c5b5244af6cad68a5ecd67c11510458e733f18e7bb6660a6",
+        "authdigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "depends": [
+        ],
+        "fee": 2112,
+        "sigops": 1
+      }
+    ],
+    "coinbasetxn": {
+      "data": "050000800a27a726b4d0d6c20000000006c41a00010000000000000000000000000000000000000000000000000000000000000000ffffffff050306c41a00ffffffff04c0bae60e000000001976a914b7a1d9ba13abbc681777eb8561efc9a8747c45c488ac38c94d010000000017a9143e26d22802442171393f2a72adae960987bd55dc8740787d010000000017a914931fec54c1fea86e574462cc32013f5400b8912987286bee000000000017a914d45cb1adffb5215a42720532a076f02c7c778c9087000000",
+      "hash": "fd0f4fb6444f8bf90eab928395cea6312005b6e9f3da6cd1adfcdff0f6b64663",
+      "authdigest": "9523af64d943524dfaba431e69de14f429d87e5e20f8e4bdfc406f91c3ff8a2e",
+      "depends": [
+      ],
+      "fee": -2112,
+      "sigops": 1,
+      "required": true
+    },
+    "longpollid": "00000000003ebf83625de8dca4f1e4b20bf429048658f90bd5bc64cb31ab60f718",
+    "target": "0000000002064f00000000000000000000000000000000000000000000000000",
+    "mintime": 1659072745,
+    "mutable": [
+      "time",
+      "transactions",
+      "prevblock"
+    ],
+    "noncerange": "00000000ffffffff",
+    "sigoplimit": 20000,
+    "sizelimit": 2000000,
+    "curtime": 1659078144,
+    "bits": "1c02064f",
+    "height": 1754118
+  }
+}
+
 exports.getBlockTemplateWithTransactions = function() {
   return {
     "capabilities": [

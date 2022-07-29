@@ -202,7 +202,7 @@ const Hashes = function(config, rpcData) {
     const padding = '0000000000000000000000000000000000000000000000000000000000000000';
 
     // Build Auth Data Root Digest
-    let nLeaves = 0;
+    let nLeaves = 1;
     const digest = _this.handleAuthDigest(scriptSig).digest();
 
     // Build + Update Digest w/ Transaction Hashes
@@ -213,7 +213,7 @@ const Hashes = function(config, rpcData) {
     });
 
     // Add Padding to Buffers Until Reaching a Power of 2
-    while ((Math.log(nLeaves) / Math.log(2)) % 1 === 0) {
+    while ((Math.log(nLeaves) / Math.log(2)) % 1 !== 0) {
       buffers.push(Buffer.from(padding, 'hex'));
       nLeaves += 1;
     }
