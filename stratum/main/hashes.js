@@ -1,4 +1,5 @@
 const blake2b = require('blake2b');
+const fastRoot = require('merkle-lib/fastRoot');
 const utils = require('./utils');
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,8 +195,64 @@ const Hashes = function(config, rpcData) {
     return authDigest;
   };
 
+  // Build Zcash Auth Root Digest
+  this.handleAuthRootDigest = function(scriptSig) {
+
+    // Handle Digest Structure
+    const padding = '0000000000000000000000000000000000000000000000000000000000000000';
+
+    // Build Auth Data Root Digest
+    let nLeaves = 0;
+    const digest = _this.handleAuthDigest(scriptSig).digest();
+
+    // Build + Update Digest w/ Transaction Hashes
+    let buffers = [Buffer.from(digest, 'hex')];
+    _this.rpcData.transactions.forEach((transaction) => {
+      buffers.push(utils.reverseBuffer(Buffer.from(transaction.authdigest, 'hex')));
+      nLeaves += 1;
+    });
+
+    // Add Padding to Buffers Until Reaching a Power of 2
+    while ((Math.log(nLeaves) / Math.log(2)) % 1 === 0) {
+      buffers.push(Buffer.from(padding, 'hex'));
+      nLeaves += 1;
+    }
+
+    // Build Root Digest from Hashes
+    while (buffers.length > 1) {
+      const buffersNew = [];
+      for (let i = 0; i < buffers.length; i += 2) {
+        const authRootPersonal = Buffer.from('ZcashAuthDatHash');
+        const authRootDigest = blake2b(32, null, null, authRootPersonal, true)
+          .update(new Uint8Array(buffers[i]))
+          .update(new Uint8Array(buffers[i + 1]));
+        buffersNew.push(Buffer.from(authRootDigest.digest(), 'hex'));
+      }
+      buffers = buffersNew;
+    }
+
+    // Return Auth Root Digest
+    return buffers[0];
+  }
+
+  // Build Zcash Merkle Root
+  this.handleMerkleRoot = function(outputs) {
+
+    // Handle Initial Digest
+    const digest = _this.handleTxIdDigest(outputs).digest();
+
+    // Build + Update Digest w/ Transaction Hashes
+    const buffers = [Buffer.from(digest, 'hex')];
+    _this.rpcData.transactions.forEach((transaction) => {
+      buffers.push(utils.reverseBuffer(Buffer.from(transaction.hash, 'hex')));
+    });
+
+    // Return Block Merkle Root
+    return fastRoot(buffers, utils.sha256d);
+  };
+
   // Build Zcash Block Commitments Digest
-  this.handleCommitDigest = function(chainHistory, scriptSig) {
+  this.handleCommitRoot = function(chainHistory, scriptSig) {
 
     // Handle Digest Structure
     const padding = '0000000000000000000000000000000000000000000000000000000000000000';
@@ -204,11 +261,11 @@ const Hashes = function(config, rpcData) {
     const commitPersonal = Buffer.from('ZcashBlockCommit');
     const commitDigest = blake2b(32, null, null, commitPersonal, true)
       .update(new Uint8Array(utils.reverseBuffer(chainHistory, 'hex')))
-      .update(new Uint8Array(_this.handleAuthDigest(scriptSig).digest()))
+      .update(new Uint8Array(_this.handleAuthRootDigest(scriptSig)))
       .update(new Uint8Array(Buffer.from(padding, 'hex')));
 
     // Return Block Commitments Digest
-    return commitDigest;
+    return Buffer.from(commitDigest.digest('hex'), 'hex');
   };
 };
 

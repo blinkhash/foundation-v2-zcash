@@ -23,8 +23,8 @@ const Template = function(jobId, config, rpcData) {
   this.generation = new Transactions(config, rpcData).handleGeneration();
 
   // Build Transaction Digests
-  this.merkle = Buffer.from(_this.hashes.handleTxIdDigest(_this.generation[2]).digest('hex'), 'hex');
-  this.commit = Buffer.from(_this.hashes.handleCommitDigest(_this.history, _this.generation[1]).digest('hex'), 'hex');
+  this.merkle = _this.hashes.handleMerkleRoot(_this.generation[2]);
+  this.commit = _this.hashes.handleCommitRoot(_this.history, _this.generation[1]);
 
   // Manage Serializing Block Headers
   this.handleHeader = function(version, nTime, nonce) {
