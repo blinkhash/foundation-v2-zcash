@@ -56,7 +56,8 @@ const Transactions = function(config, rpcData) {
     const txActionsOrchard = 0;
 
     // Calculate Coin Block Reward
-    let reward = _this.rpcData.subsidy.miner * 100000000;
+    const fees = _this.rpcData.transactions.reduce((sum, tx) => sum + tx.fee, 0);
+    let reward = (_this.rpcData.subsidy.miner * 100000000) + fees;
     const network = !_this.config.settings.testnet ?
       _this.configMainnet :
       _this.configTestnet;

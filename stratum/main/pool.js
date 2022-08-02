@@ -114,7 +114,8 @@ const Pool = function(config, configMain, responseFn) {
         .flatMap((response) => response.blocks));
       daemon.sendCommands([['getpeerinfo', []]], true, (result) => {
         const peers = result.response;
-        const totalBlocks = Math.max(0, peers.flatMap((response) => response.startingheight));
+        const peersBlocks = peers.flatMap((response) => response.startingheight);
+        const totalBlocks = peersBlocks.reduce((max, cur) => max >= cur ? max : cur);
         const percent = (blocks / totalBlocks * 100).toFixed(2);
         _this.emitLog('warning', true, _this.text.stratumDownloadedText1(percent, peers.length));
       });
