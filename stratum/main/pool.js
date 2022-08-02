@@ -435,9 +435,6 @@ const Pool = function(config, configMain, responseFn) {
 
     // Establish Job Manager Instance
     _this.manager = new Manager(_this.config, _this.configMain);
-    _this.manager.on('manager.block.new', (template) => {
-      if (_this.network) _this.network.broadcastMiningJobs(template, true);
-    });
 
     // Handle Shares on Submission
     _this.manager.on('manager.share', (shareData, auxShareData, blockValid) => {
@@ -462,6 +459,16 @@ const Pool = function(config, configMain, responseFn) {
           }
         });
       });
+    });
+
+    // Handle New Block Templates
+    _this.manager.on('manager.block.new', (template) => {
+      if (_this.network) _this.network.broadcastMiningJobs(template, true);
+    });
+
+    // Handle Updated Block Templates
+    _this.manager.on('manager.block.updated', (template) => {
+      if (_this.network) _this.network.broadcastMiningJobs(template, false);
     });
   };
 
@@ -662,7 +669,7 @@ const Pool = function(config, configMain, responseFn) {
       _this.handlePrimaryTemplate(false, (error, rpcData, newBlock) => {
         _this.emitLog('debug', true, _this.text.stratumNetworkText1(_this.config.settings.jobRebroadcastTimeout / 1000));
         if (error || newBlock) return;
-        _this.manager.updateCurrentJob(rpcData);
+        _this.manager.handleUpdates(rpcData);
       });
     });
 
