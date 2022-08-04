@@ -36,7 +36,7 @@ const outputsTransactions = [
 
 describe('Test hashes functionality', () => {
 
-  let configCopy, rpcDataCopy;
+  let configCopy, rpcDataCopy, rpcDataTransactionCopy, rpcDataTransactionsCopy;
   beforeEach(() => {
     configCopy = JSON.parse(JSON.stringify(config));
     rpcDataCopy = JSON.parse(JSON.stringify(testdata.getBlockTemplate()));

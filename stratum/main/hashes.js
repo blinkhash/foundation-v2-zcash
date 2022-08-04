@@ -233,7 +233,7 @@ const Hashes = function(config, rpcData) {
 
     // Return Auth Root Digest
     return buffers[0];
-  }
+  };
 
   // Build Zcash Merkle Root
   this.handleMerkleRoot = function(outputs) {

@@ -167,7 +167,7 @@ const Pool = function(config, configMain, responseFn) {
         callback(null, false);
       }
     });
-  }
+  };
 
   // Process Primary Block Template
   this.handlePrimaryTemplate = function(newBlock, callback) {
@@ -275,7 +275,7 @@ const Pool = function(config, configMain, responseFn) {
     } else {
       callback(null, false);
     }
-  }
+  };
 
   // Process Auxiliary Block Template
   this.handleAuxiliaryTemplate = function(callback) {
@@ -559,7 +559,7 @@ const Pool = function(config, configMain, responseFn) {
                 } else {
                   pollingFlag = false;
                 }
-              })
+              });
             });
           }
         });
