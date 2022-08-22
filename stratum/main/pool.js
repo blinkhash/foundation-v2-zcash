@@ -146,7 +146,7 @@ const Pool = function(config, configMain, responseFn) {
   };
 
   // Check for New Primary Block Template
-  this.checkPrimaryTemplate = function(callback) {
+  this.checkPrimaryTemplate = function(auxUpdate, callback) {
 
     // Build Daemon Commands
     const commands = [['getblockchaininfo', []]];
@@ -163,6 +163,8 @@ const Pool = function(config, configMain, responseFn) {
       } else if ((_this.primary.height !== result.response.blocks) || (_this.primary.previousblockhash !== result.response.bestblockhash)) {
         _this.primary.height = result.response.blocks;
         _this.primary.previousblockhash = result.response.bestblockhash;
+        callback(null, true);
+      } else if (auxUpdate) {
         callback(null, true);
       } else {
         callback(null, false);
@@ -192,9 +194,7 @@ const Pool = function(config, configMain, responseFn) {
         _this.emitLog('error', false, _this.text.stratumTemplateText1(result[1].instance.host, JSON.stringify(result[1].error)));
         callback(result[1].error);
       } else {
-        if (_this.auxiliary.enabled) {
-          result[0].response.auxData = _this.auxiliary.rpcData;
-        }
+        if (_this.auxiliary.enabled) result[0].response.auxData = _this.auxiliary.rpcData;
         result[0].response.subsidy = result[1].response;
         const newBlockFound = _this.manager.handleTemplate(result[0].response, newBlock);
         callback(null, result[0].response, newBlockFound);
@@ -444,23 +444,25 @@ const Pool = function(config, configMain, responseFn) {
       const shareValid = typeof shareData.error === 'undefined';
       const auxBlockValid = _this.checkAuxiliary(shareData, auxShareData);
 
-      // Process Auxiliary Submission
-      if (!shareData.error && auxBlockValid) {
-        _this.handleAuxiliary(auxShareData, true, (accepted, outputData) => {
-          _this.emit('pool.share', outputData, shareValid, accepted);
-          _this.emitLog('special', false, _this.text.stratumManagerText2());
-        });
-      }
-
       // Process Share/Primary Submission
       _this.handlePrimary(shareData, blockValid, (accepted, outputData) => {
         _this.emit('pool.share', outputData, shareValid, accepted);
         _this.handlePrimaryTemplate(auxBlockValid, (error, result, newBlock) => {
-          if (newBlock && blockValid) {
+          if (accepted && newBlock && blockValid) {
             _this.emitLog('special', false, _this.text.stratumManagerText1());
           }
         });
       });
+
+      // Process Auxiliary Submission
+      if (!shareData.error && auxBlockValid) {
+        _this.handleAuxiliary(auxShareData, true, (accepted, outputData) => {
+          _this.emit('pool.share', outputData, shareValid, accepted);
+          if (accepted && auxBlockValid) {
+            _this.emitLog('special', false, _this.text.stratumManagerText2());
+          }
+        });
+      }
     });
 
     // Handle New Block Templates
@@ -550,12 +552,12 @@ const Pool = function(config, configMain, responseFn) {
         _this.checkAuxiliaryTemplate((auxError) => {
           if (!auxError) {
             _this.handleAuxiliaryTemplate((auxError, auxResult, auxUpdate) => {
-              _this.checkPrimaryTemplate((error, update) => {
+              _this.checkPrimaryTemplate(auxUpdate, (error, update) => {
+                if (auxUpdate) _this.emitLog('log', true, _this.text.stratumPollingText2(_this.config.auxiliary.coin.name, auxResult.height));
                 if (!error && update) {
                   _this.handlePrimaryTemplate(auxUpdate, (error, result, update) => {
                     pollingFlag = false;
                     if (update) _this.emitLog('log', true, _this.text.stratumPollingText1(_this.config.primary.coin.name, result.height));
-                    if (auxUpdate) _this.emitLog('log', true, _this.text.stratumPollingText2(_this.config.auxiliary.coin.name, auxResult.height));
                   });
                 } else {
                   pollingFlag = false;
