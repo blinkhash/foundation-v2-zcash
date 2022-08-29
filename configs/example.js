@@ -52,6 +52,7 @@ config.primary.address = '[address]';
 config.primary.coin = {};
 config.primary.coin.name = 'Zcash';
 config.primary.coin.symbol = 'ZEC';
+config.primary.coin.algorithm = 'equihash';
 
 // Daemon Configuration
 config.primary.daemons = [];
