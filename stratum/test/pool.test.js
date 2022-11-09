@@ -238,9 +238,11 @@ describe('Test pool functionality', () => {
   test('Test pool settings setup [1]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toContain('Could not start pool, error with RPC response');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toContain('Could not start pool, error with RPC response');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       pool.setupSettings(() => {});
@@ -269,9 +271,11 @@ describe('Test pool functionality', () => {
   test('Test pool settings setup [3]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toContain('Could not start pool, error with RPC command response: validateaddress');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toContain('Could not start pool, error with RPC command response: validateaddress');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       nock('http://127.0.0.1:8232')
@@ -288,9 +292,11 @@ describe('Test pool functionality', () => {
   test('Test pool settings setup [4]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toBe('The daemon reports that the given address is not valid');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toBe('The daemon reports that the given address is not valid');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       nock('http://127.0.0.1:8232')
@@ -357,9 +363,11 @@ describe('Test pool functionality', () => {
     configCopy.primary.recipients = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('warning');
-      expect(text).toBe('No recipients have been added, which means that no fees will be taken');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('warning');
+        expect(text).toBe('No recipients have been added, which means that no fees will be taken');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -428,9 +436,11 @@ describe('Test pool functionality', () => {
   test('Test pool manager setup [6]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when submitting block: true');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when submitting block: true');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -488,9 +498,11 @@ describe('Test pool functionality', () => {
   test('Test pool manager setup [7]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toBe('Primary daemon instance (127.0.0.1) rejected a supposedly valid block');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toBe('Primary daemon instance (127.0.0.1) rejected a supposedly valid block');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -549,13 +561,15 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        expect(response[0][0]).toBe('special');
-        expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
-        expect(response[1][0]).toBe('error');
-        expect(response[1][1]).toBe('The block was rejected by the network');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          expect(response[0][0]).toBe('special');
+          expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
+          expect(response[1][0]).toBe('error');
+          expect(response[1][1]).toBe('The block was rejected by the network');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -630,13 +644,15 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        expect(response[0][0]).toBe('special');
-        expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
-        expect(response[1][0]).toBe('special');
-        expect(response[1][1]).toBe('Block notification via RPC after primary block submission');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          expect(response[0][0]).toBe('special');
+          expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
+          expect(response[1][0]).toBe('special');
+          expect(response[1][1]).toBe('Block notification via RPC after primary block submission');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -715,13 +731,15 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        expect(response[0][0]).toBe('special');
-        expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
-        expect(response[1][0]).toBe('error');
-        expect(response[1][1]).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          expect(response[0][0]).toBe('special');
+          expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
+          expect(response[1][0]).toBe('error');
+          expect(response[1][1]).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -800,13 +818,15 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        expect(response[0][0]).toBe('special');
-        expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
-        expect(response[1][0]).toBe('error');
-        expect(response[1][1]).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          expect(response[0][0]).toBe('special');
+          expect(response[0][1]).toBe('Submitted a primary block (Zcash:1) successfully to Zcash\'s daemon instance(s)');
+          expect(response[1][0]).toBe('error');
+          expect(response[1][1]).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -884,9 +904,11 @@ describe('Test pool functionality', () => {
   test('Test pool manager setup [12]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -945,9 +967,11 @@ describe('Test pool functionality', () => {
   test('Test pool manager setup [13]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -978,9 +1002,11 @@ describe('Test pool functionality', () => {
   test('Test pool manager setup [14]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('error');
-      expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('error');
+        expect(text).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -1029,9 +1055,11 @@ describe('Test pool functionality', () => {
   test('Test pool blockchain setup [2]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('warning');
-      expect(text).toBe('Downloaded 100.00% of blockchain from 1 peers');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('warning');
+        expect(text).toBe('Downloaded 100.00% of blockchain from 1 peers');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -1086,9 +1114,11 @@ describe('Test pool functionality', () => {
     configCopy.auxiliary.daemons = auxiliaryDaemons;
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('warning');
-      expect(text).toBe('Downloaded 100.00% of blockchain from 1 peers');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('warning');
+        expect(text).toBe('Downloaded 100.00% of blockchain from 1 peers');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -1163,13 +1193,15 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        expect(response[0][0]).toBe('error');
-        expect(response[0][1]).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
-        expect(response[1][0]).toBe('error');
-        expect(response[1][1]).toBe('RPC error with primary daemon instance when creating the first job');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          expect(response[0][0]).toBe('error');
+          expect(response[0][1]).toBe('RPC error with primary daemon instance (127.0.0.1) when requesting a primary template update: true');
+          expect(response[1][0]).toBe('error');
+          expect(response[1][1]).toBe('RPC error with primary daemon instance when creating the first job');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -1192,9 +1224,11 @@ describe('Test pool functionality', () => {
   test('Test pool first job setup [3]', (done) => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      expect(type).toBe('warning');
-      expect(text).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-      done();
+      if (type !== 'debug') {
+        expect(type).toBe('warning');
+        expect(text).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+        done();
+      }
     });
     mockSetupDaemons(pool, () => {
       mockSetupSettings(pool, () => {
@@ -1239,13 +1273,15 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('log');
-        expect(response[1][1]).toBe('Requested template from primary chain (Zcash:1911390) via RPC polling');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('log');
+          expect(response[1][1]).toBe('Requested template from primary chain (Zcash:1911390) via RPC polling');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -1284,15 +1320,17 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 3) {
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('log');
-        expect(response[1][1]).toBe('Requested template from auxiliary chain (Namecoin:2) via RPC polling');
-        expect(response[2][0]).toBe('log');
-        expect(response[2][1]).toBe('Requested template from primary chain (Zcash:1911389) via RPC polling');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 3) {
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('log');
+          expect(response[1][1]).toBe('Requested template from auxiliary chain (Namecoin:2) via RPC polling');
+          expect(response[2][0]).toBe('log');
+          expect(response[2][1]).toBe('Requested template from primary chain (Zcash:1911389) via RPC polling');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -1347,13 +1385,15 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('error');
-        expect(response[1][1]).toBe('RPC error with auxiliary daemon instance (127.0.0.1) when requesting an auxiliary template update: true');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('error');
+          expect(response[1][1]).toBe('RPC error with auxiliary daemon instance (127.0.0.1) when requesting an auxiliary template update: true');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -1410,15 +1450,17 @@ describe('Test pool functionality', () => {
     const response = [];
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 3) {
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('log');
-        expect(response[1][1]).toBe('Requested template from auxiliary chain (Namecoin:2) via RPC polling');
-        expect(response[2][0]).toBe('log');
-        expect(response[2][1]).toBe('Requested template from primary chain (Zcash:1911389) via RPC polling');
-        done();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 3) {
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('log');
+          expect(response[1][1]).toBe('Requested template from auxiliary chain (Namecoin:2) via RPC polling');
+          expect(response[2][0]).toBe('log');
+          expect(response[2][1]).toBe('Requested template from primary chain (Zcash:1911389) via RPC polling');
+          done();
+        }
       }
     });
     mockSetupDaemons(pool, () => {
@@ -1493,12 +1535,10 @@ describe('Test pool functionality', () => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
       response.push([type, text]);
-      if (response.length === 2) {
+      if (response.length === 9) {
         pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('debug');
-        expect(response[1][1]).toBe('No new blocks for 60 seconds. Updating transactions and rebroadcasting work');
+        expect(response[8][0]).toBe('debug');
+        expect(response[8][1]).toBe('No new blocks for 60 seconds. Updating transactions and rebroadcasting work');
         pool.network.stopNetwork();
       }
     });
@@ -1528,12 +1568,10 @@ describe('Test pool functionality', () => {
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
       response.push([type, text]);
-      if (response.length === 3) {
+      if (response.length === 10) {
         pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[2][0]).toBe('debug');
-        expect(response[2][1]).toBe('No new blocks for 60 seconds. Updating transactions and rebroadcasting work');
+        expect(response[9][0]).toBe('debug');
+        expect(response[9][1]).toBe('No new blocks for 60 seconds. Updating transactions and rebroadcasting work');
         pool.network.stopNetwork();
       }
     });
@@ -1609,14 +1647,14 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('log');
-        expect(response[1][1]).toBe('Difficulty update queued for worker: t3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym (8)');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[1][0]).toBe('log');
+          expect(response[1][1]).toBe('Difficulty update queued for worker: t3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym (8)');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1643,14 +1681,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('log');
-        expect(response[1][1]).toBe('Difficulty updated successfully for worker: t3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym (8)');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('log');
+          expect(response[1][1]).toBe('Difficulty updated successfully for worker: t3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym (8)');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1678,14 +1718,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('A client (client [example]) sent a malformed message to the server: test');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('A client (client [example]) sent a malformed message to the server: test');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1712,14 +1754,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('Socket flooding was detected from a client (client [example])');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('Socket flooding was detected from a client (client [example])');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1746,14 +1790,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('A socket error was detected from a client (client [example]): "test"');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('A socket error was detected from a client (client [example]): "test"');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1780,14 +1826,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('A client (client [example]) was timed out from the server: "test"');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('A client (client [example]) was timed out from the server: "test"');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1814,14 +1862,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('A client (client [example]) disconnected from the server');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('A client (client [example]) disconnected from the server');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1848,14 +1898,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('A client (client [example]) disconnected from the server');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('A client (client [example]) disconnected from the server');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1882,14 +1934,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('Rejected incoming connection (client [example]). The client is banned for 1000 seconds');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('Rejected incoming connection (client [example]). The client is banned for 1000 seconds');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1916,14 +1970,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('log');
-        expect(response[1][1]).toBe('Forgave banned client (client [example]). They can now reconnect to the pool');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('log');
+          expect(response[1][1]).toBe('Forgave banned client (client [example]). They can now reconnect to the pool');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1950,14 +2006,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('Because of malicious behavior, a client (client [example]) has been banned');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('Because of malicious behavior, a client (client [example]) has been banned');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
@@ -1984,14 +2042,16 @@ describe('Test pool functionality', () => {
     const client = mockClient();
     const pool = new Pool(configCopy, configMainCopy, () => {});
     pool.on('pool.log', (type, text) => {
-      response.push([type, text]);
-      if (response.length === 2) {
-        pool.network.on('network.stopped', () => done());
-        expect(response[0][0]).toBe('warning');
-        expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
-        expect(response[1][0]).toBe('warning');
-        expect(response[1][1]).toBe('A client (client [example]) sent an unknown stratum method to the server: test');
-        pool.network.stopNetwork();
+      if (type !== 'debug') {
+        response.push([type, text]);
+        if (response.length === 2) {
+          pool.network.on('network.stopped', () => done());
+          expect(response[0][0]).toBe('warning');
+          expect(response[0][1]).toBe('Network difficulty (0) is lower than the difficulty on port 3002 (32)');
+          expect(response[1][0]).toBe('warning');
+          expect(response[1][1]).toBe('A client (client [example]) sent an unknown stratum method to the server: test');
+          pool.network.stopNetwork();
+        }
       }
     });
     pool.on('client.socket.success', () => {
