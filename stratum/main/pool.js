@@ -246,7 +246,7 @@ const Pool = function(config, configMain, callback) {
         pollingFlag = true;
         _this.checkPrimaryTemplate(false, (error, update) => {
           if (!error && update) {
-            _this.handlePrimaryTemplate(false, (error, result, update) => {
+            _this.handlePrimaryTemplate(false, true, (error, result, update) => {
               pollingFlag = false;
               if (update) _this.emitLog('log', true, _this.text.stratumPollingText1(_this.config.primary.coin.name, result.height));
             });
@@ -272,7 +272,7 @@ const Pool = function(config, configMain, callback) {
 
       // Handle Block Notifications
       sock.on('message', () => {
-        _this.handlePrimaryTemplate(false, (error, result, update) => {
+        _this.handlePrimaryTemplate(false, true, (error, result, update) => {
           if (update) _this.emitLog('log', true, _this.text.stratumZmqText3(_this.config.primary.coin.name, result.height));
         });
       });
@@ -321,7 +321,7 @@ const Pool = function(config, configMain, callback) {
   };
 
   // Process Primary Block Template
-  this.handlePrimaryTemplate = function(newBlock, callback) {
+  this.handlePrimaryTemplate = function(newBlock, newBroadcast, callback) {
 
     // Build Daemon Commands
     const rules = ['segwit'];
@@ -344,7 +344,7 @@ const Pool = function(config, configMain, callback) {
       } else {
         if (_this.auxiliary.enabled) result[0].response.auxData = _this.auxiliary.rpcData;
         result[0].response.subsidy = result[1].response;
-        const newBlockFound = _this.manager.handleTemplate(result[0].response, newBlock);
+        const newBlockFound = _this.manager.handleTemplate(result[0].response, newBlock, newBroadcast);
         callback(null, result[0].response, newBlockFound);
       }
     });
@@ -616,7 +616,7 @@ const Pool = function(config, configMain, callback) {
               _this.checkPrimaryTemplate(auxUpdate, (error, update) => {
                 if (auxUpdate) _this.emitLog('log', true, _this.text.stratumPollingText2(_this.config.auxiliary.coin.name, auxResult.height));
                 if (!error && update) {
-                  _this.handlePrimaryTemplate(auxUpdate, (error, result, update) => {
+                  _this.handlePrimaryTemplate(auxUpdate, false, (error, result, update) => {
                     pollingFlag = false;
                     if (update) _this.emitLog('log', true, _this.text.stratumPollingText1(_this.config.primary.coin.name, result.height));
                   });
@@ -647,7 +647,7 @@ const Pool = function(config, configMain, callback) {
       sock.on('message', () => {
         _this.handleAuxiliaryTemplate((auxError, auxResult, auxUpdate) => {
           if (auxUpdate) _this.emitLog('log', true, _this.text.stratumZmqText4(_this.config.auxiliary.coin.name, auxResult.height));
-          _this.handlePrimaryTemplate(auxUpdate, (error, result, update) => {
+          _this.handlePrimaryTemplate(auxUpdate, false, (error, result, update) => {
             if (update) _this.emitLog('log', true, _this.text.stratumZmqText3(_this.config.primary.coin.name, result.height));
           });
         });
@@ -969,7 +969,7 @@ const Pool = function(config, configMain, callback) {
               _this.checkPrimaryTemplate(auxUpdate, (error, update) => {
                 if (auxUpdate) _this.emitLog('log', true, _this.text.stratumPollingText2(_this.config.auxiliary.coin.name, auxResult.height));
                 if (!error && update) {
-                  _this.handlePrimaryTemplate(auxUpdate, (error, result, update) => {
+                  _this.handlePrimaryTemplate(auxUpdate, true, (error, result, update) => {
                     pollingFlag = false;
                     if (update) _this.emitLog('log', true, _this.text.stratumPollingText1(_this.config.primary.coin.name, result.height));
                   });
@@ -1245,7 +1245,7 @@ const Pool = function(config, configMain, callback) {
     _this.handleAuxiliaryTemplate((error) => {
       if (error) _this.emitLog('error', false, _this.text.stratumFirstJobText1());
       else {
-        _this.handlePrimaryTemplate(false, (error) => {
+        _this.handlePrimaryTemplate(false, true, (error) => {
           if (error) _this.emitLog('error', false, _this.text.stratumFirstJobText1());
           else {
             _this.config.ports.forEach((port) => {
@@ -1414,7 +1414,7 @@ const Pool = function(config, configMain, callback) {
 
     // Handle Periods Without Found Blocks/Shares
     _this.network.on('network.timeout', () => {
-      _this.handlePrimaryTemplate(false, (error, rpcData, newBlock) => {
+      _this.handlePrimaryTemplate(false, true, (error, rpcData, newBlock) => {
         _this.emitLog('debug', true, _this.text.stratumNetworkText1(_this.config.settings.timeout.rebroadcast / 1000));
         if (error || newBlock) return;
         _this.manager.handleUpdates(rpcData);
